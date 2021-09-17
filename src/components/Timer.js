@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 
-const Timer = ({ deadline }) => {
+const Timer = ({ deadlineDate, deadlineMinutesHours }) => {
+  console.log(deadlineDate);
+  console.log(deadlineMinutesHours);
+
   const [days, setDays] = useState(0);
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
@@ -11,7 +14,12 @@ const Timer = ({ deadline }) => {
   };
 
   const getTime = () => {
-    const time = Date.parse(deadline) - Date.parse(new Date());
+    // time = deadline date in milliseconds - actual date in milliseconds
+    const time = Date.parse(deadlineDate) - Date.now();
+
+    // for the timezones in hours
+    const timezoneOffset = new Date().getTimezoneOffset() / 60;
+
     if (time < 0) {
       setDays(0);
       setHours(0);
@@ -19,14 +27,14 @@ const Timer = ({ deadline }) => {
       setSeconds(0);
     } else {
       setDays(Math.floor(time / (1000 * 60 * 60 * 24)));
-      setHours(Math.floor((time / (1000 * 60 * 60)) % 24));
+      setHours((Math.floor(time / (1000 * 60 * 60)) % 24) + timezoneOffset); // + or - GMT
       setMinutes(Math.floor((time / 1000 / 60) % 60));
       setSeconds(Math.floor((time / 1000) % 60));
     }
   };
 
   const today = new Date();
-  const time =
+  const localTime =
     leadingZero(today.getHours()) +
     ':' +
     leadingZero(today.getMinutes()) +
@@ -40,7 +48,7 @@ const Timer = ({ deadline }) => {
 
   return (
     <div>
-      <div> Local Time: {time}</div>
+      <div> Local Time: {localTime}</div>
       <div>
         {leadingZero(days)} Days {leadingZero(hours)} Hours{' '}
         {leadingZero(minutes)} Minutes {leadingZero(seconds)} Seconds
